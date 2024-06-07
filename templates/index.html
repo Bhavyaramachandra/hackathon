@@ -3,28 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <title>Connecting the Dots</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/index.css') }}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.0/socket.io.min.js"></script>
 </head>
 <body>
-    <h1>Welcome to Connecting The Dots</h1>
+    <center>
+        <h1>Welcome to Connecting The Dots</h1>
+    </center>
     <div class="container">
         <div class="game">
             <canvas id="gameCanvas" width="800" height="600"></canvas>
             <div id="levelIndicator"></div>
-        <button id="startButton">Start</button>
-        <button id="stopButton">Stop</button>
-        <button id="resetButton">Reset</button>
-        <button id="restartLevelButton">Restart Level</button>
+            <button id="startButton">Start</button>
+            <button id="stopButton">Stop</button>
+            <button id="resetButton">Reset</button>
+            <button id="restartLevelButton">Restart Level</button>
         </div>
         <div class="video">
-            <img src="{{ url_for('video_feed') }}" id="videoStream">
+            <img src="{{ url_for('video_feed') }}" id="videoStream" alt="Video Stream">
         </div>
-    <div>
-        <div id="errorMessage" class="error-message">
-            <p id="errorMessageText"></p>
-            <button id="errorButton">Okay</button>
-        </div>
+    </div>
+    <div id="errorMessage" class="error-message">
+        <p id="errorMessageText"></p>
+        <button id="errorButton">Okay</button>
+    </div>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>

@@ -57,22 +57,24 @@ button:hover {
 } */
  /* index.css */
 
- .container {
+ /* General styles */
+body {
+    font-family: Arial, sans-serif;
+}
+
+.container {
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     max-width: 1200px;
     margin: 0 auto;
-    gap:30px;
+    gap: 30px;
 }
 
-.game {
-    width: 50%;    max-width: 50%;
-}
-
-.video {
-    width: 50%;
-    max-width: 50%;
+.game, .video {
+    width: 100%;
+    max-width: 100%;
 }
 
 canvas {
@@ -103,6 +105,7 @@ button:hover {
     border-radius: 5px;
     text-align: center;
 }
+
 .error-message {
     display: none;
     position: fixed;
@@ -133,3 +136,59 @@ button:hover {
 #errorButton:hover {
     background-color: #c82333;
 }
+
+/* Styles for tablets and above */
+@media (min-width: 768px ) and (max-width: 1023px){
+    .container {
+        flex-direction: row;
+        align-items: flex-start;
+    }
+
+    .game, .video {
+        width: 50%;
+        max-width: 50%;
+    }
+}
+
+/* Styles for larger screens */
+@media (min-width: 1024px) {
+    .container {
+        flex-direction: row;
+        gap:30px;
+    }
+    .game, .video {
+        width: 50%;
+        max-width: 50%;
+    }
+}
+/* Mobile styles */
+@media (max-width: 767px) {
+    .container {
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .game, .video {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    button {
+        width: 100%;
+        max-width: 300px;
+    }
+    #levelIndicator {
+        flex-direction: column;
+        align-items: center;
+    }
+button{
+    flex-direction: column;
+    align-items: center;
+}
+    .error-message {
+        width: 90%;
+        max-width: 90%;
+    }
+}
+
