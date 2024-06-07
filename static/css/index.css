@@ -1,0 +1,135 @@
+/* styles.css
+
+.container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.level-indicator {
+    flex-shrink: 0;
+    width: calc(33.33% * 2); 
+     max-width: calc(50% - 10px); 
+}
+
+.level-indicator h2 {
+    margin-bottom: 10px;
+    color: #333; 
+
+.level {
+    padding: 5px;
+    text-align: center;
+    border: 2px solid #000;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    width: 100%;
+    box-sizing: border-box;
+    max-width: 100%; 
+    font-size: 14px;
+}
+
+.game {
+    width: calc(50% - 10px); 
+    max-width: calc(50% - 10px);
+}
+
+canvas {
+    border: 2px solid #000;
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+button {
+    padding: 10px 20px;
+    margin: 5px;
+    font-size: 16px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #218838;
+} */
+ /* index.css */
+
+ .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    max-width: 1200px;
+    margin: 0 auto;
+    gap:30px;
+}
+
+.game {
+    width: 50%;    max-width: 50%;
+}
+
+.video {
+    width: 50%;
+    max-width: 50%;
+}
+
+canvas {
+    border: 2px solid #000;
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+button {
+    padding: 10px 20px;
+    margin: 5px;
+    font-size: 16px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #218838;
+}
+
+#levelIndicator .level {
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #f1f1f1;
+    border-radius: 5px;
+    text-align: center;
+}
+.error-message {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(255, 255, 255, 0.9);
+    border: 2px solid #000;
+    padding: 20px;
+    text-align: center;
+    z-index: 1000;
+}
+
+.error-message p {
+    margin-bottom: 20px;
+}
+
+#errorButton {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#errorButton:hover {
+    background-color: #c82333;
+}
