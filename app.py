@@ -14,7 +14,7 @@ def detect_motion(current_frame, previous_frame):
     frame_diff = cv2.absdiff(gray_current, gray_previous)
     
     # Apply threshold to filter out small differences
-    _, threshold = cv2.threshold(frame_diff, 30, 255, cv2.THRESH_BINARY)
+    _, threshold = cv2.threshold(frame_diff, 15, 255, cv2.THRESH_BINARY)
     
     # Find contours of thresholded image
     contours, _ = cv2.findContours(threshold, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -22,7 +22,7 @@ def detect_motion(current_frame, previous_frame):
     # Iterate through contours and find motion
     motion_detected = False
     for contour in contours:
-        if cv2.contourArea(contour) > 1000: # Adjust this threshold based on your application
+        if cv2.contourArea(contour) > 200: # Adjust this threshold based on your application
             motion_detected = True
             break
     
@@ -72,3 +72,5 @@ def video_feed():
 
 if __name__ == '__main__':
     socketio.run(app,debug=True)
+
+   

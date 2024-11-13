@@ -13,12 +13,12 @@
 
     // Define levels and corresponding timer durations (in milliseconds)
     const levels = [
-        { duration: 5000 }, // Level 1: 5 seconds
-        { duration: 7000 }, // Level 2: 7 seconds
-        { duration: 9000 }, // Level 3: 9 seconds
-        { duration: 11000 }, // Level 4: 11 seconds
-        { duration: 13000 }, // Level 5: 13 seconds
-        { duration: 15000 } // Level 6: 15 seconds
+        { duration: 1000 }, // Level 1: 5 seconds
+        { duration: 2000 }, // Level 2: 7 seconds
+        { duration: 3000 }, // Level 3: 9 seconds
+        { duration: 4000 }, // Level 4: 11 seconds
+        { duration: 5000 }, // Level 5: 13 seconds
+        { duration: 6000 } // Level 6: 15 seconds
     ];
 
     // Variables
