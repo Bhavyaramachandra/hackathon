@@ -1,136 +1,118 @@
-(function() {
-    // Get canvas context
+(function () {
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
+    const levelIndicator = document.getElementById('levelIndicator');
 
-    // Define dots on the rectangle's sides
     const dots = [
         { x: 100, y: 100 },
         { x: 700, y: 100 },
-        { x: 700, y: 500 },
-        { x: 100, y: 500 }
+        { x: 700, y: 560 },
+        { x: 100, y: 560 }
     ];
 
-    // Define levels and corresponding timer durations (in milliseconds)
     const levels = [
-        { duration: 1000 }, // Level 1: 5 seconds
-        { duration: 2000 }, // Level 2: 7 seconds
-        { duration: 3000 }, // Level 3: 9 seconds
-        { duration: 4000 }, // Level 4: 11 seconds
-        { duration: 5000 }, // Level 5: 13 seconds
-        { duration: 6000 } // Level 6: 15 seconds
+        { duration: 1000, alertMessage: "Level 1 completed! Get ready for Level 2." },
+        { duration: 2000, alertMessage: "Level 2 completed! Level 3 is coming up." },
+        { duration: 3000, alertMessage: "Level 3 completed! Prepare for Level 4." },
+        { duration: 4000, alertMessage: "Level 4 completed! Final level ahead!" },
+        { duration: 5000, alertMessage: "Congratulations! 🎉 You've successfully completed all levels of the game!" }
     ];
 
-    // Variables
     let currentDotIndex = 0;
     let currentLevel = 0;
     let timerInterval;
     let timeLeft;
 
-    // Function to draw dots on the canvas
+    const socket = io.connect('http://' + document.domain + ':' + location.port);
+
     function drawDots() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = '#000';
-        dots.forEach(dot => {
+        
+        if (timeLeft !== undefined) {
             ctx.beginPath();
-            ctx.arc(dot.x, dot.y, 5, 0, Math.PI * 2);
+    ctx.arc(canvas.width / 2, canvas.height / 2, 60, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.1)'; 
+    ctx.fill();
+
+    
+    ctx.font = 'bold 48px Arial';
+    ctx.fillStyle = '#ffffff'; 
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    ctx.shadowColor = '#ffffff';
+    ctx.shadowBlur = 20;         
+    ctx.fillText(`${timeLeft}s`, canvas.width / 2, canvas.height / 2);
+
+    ctx.shadowBlur = 0;
+        }
+        
+        dots.forEach((dot, index) => {
+            ctx.beginPath();
+            ctx.arc(dot.x, dot.y, 8, 0, Math.PI * 2);
+            
+            const gradient = ctx.createRadialGradient(dot.x, dot.y, 0, dot.x, dot.y, 8);
+            gradient.addColorStop(0, '#ffffff');
+            gradient.addColorStop(1, '#8c6dfd');
+            ctx.fillStyle = gradient;
+            
+            ctx.shadowColor = '#8c6dfd';
+            ctx.shadowBlur = 15;
             ctx.fill();
+            ctx.shadowBlur = 0;
+            
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
         });
     }
 
-    function drawLines() {
-        for (let i = 0; i <= dots.length; i++) {
-            const dot1 = dots[i];
-            const dot2 = i === dots.length - 1 ? dots[0] : dots[i + 1]; // If last dot, connect to the first dot
-            drawLine(dot1, dot2, 1);
-        }
-    }
-
-    // Function to draw a line between two dots
     function drawLine(dot1, dot2, progress) {
         ctx.beginPath();
         ctx.moveTo(dot1.x, dot1.y);
         const x = dot1.x + (dot2.x - dot1.x) * progress;
         const y = dot1.y + (dot2.y - dot1.y) * progress;
         ctx.lineTo(x, y);
+        
+        const gradient = ctx.createLinearGradient(dot1.x, dot1.y, x, y);
+        gradient.addColorStop(0, '#ffffff');    
+        gradient.addColorStop(0.5, '#f5f5f5'); 
+        gradient.addColorStop(1, '#eaeaea');   
+        ctx.strokeStyle = gradient;
+        
+        ctx.lineWidth = 4;
+        ctx.lineCap = 'round';
+        
+        ctx.shadowColor = '#00ffbb';
+        ctx.shadowBlur = 10;
         ctx.stroke();
+        ctx.shadowBlur = 0;
     }
 
-    // Function to display the countdown timer
-    function displayTimer() {
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-        ctx.fillRect(canvas.width / 2 - 50, canvas.height / 2 - 30, 100, 60);
-
-        ctx.fillStyle = '#000';
-        ctx.font = '30px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText(timeLeft, canvas.width / 2, canvas.height / 2 + 10);
+    function updateLevelIndicator() {
+        levelIndicator.textContent = `Level: ${currentLevel + 1}`;
     }
 
-    // Function to create level indicators
-    function createLevelIndicators() {
-        const levelIndicator = document.getElementById('levelIndicator');
-        levels.forEach((level, index) => {
-            const levelElement = document.createElement('div');
-            levelElement.classList.add('level');
-            if (index < currentLevel) {
-                levelElement.classList.add('completed');
-            } else if (index === currentLevel) {
-                levelElement.classList.add('ongoing');
-            }
-            levelElement.textContent = `Level ${index + 1}`;
-            levelIndicator.appendChild(levelElement);
-        });
-    }
-
-    // Function to update the level indicators
-    function updateLevelIndicators() {
-        const levelIndicator = document.getElementById('levelIndicator');
-        levelIndicator.innerHTML = '';
-        levels.forEach((level, index) => {
-            const levelDiv = document.createElement('div');
-            levelDiv.classList.add('level');
-            levelDiv.textContent = `Level ${index + 1}`;
-            if (index == currentLevel - 1) {
-                levelDiv.style.backgroundColor = 'green';
-            } else if (index == currentLevel) {
-                levelDiv.style.backgroundColor = 'orange';
-            } else {
-                levelDiv.style.backgroundColor = 'white';
-            }
-            levelIndicator.appendChild(levelDiv);
-        });
-    }
-
-    // Modified startGame function to clear level indicators before creating them
     function startGame() {
-        // Clear level indicators
-        const levelIndicator = document.getElementById('levelIndicator');
-        levelIndicator.innerHTML = '';
-
-        // Clear canvas and draw dots
+        socket.emit('stop_detection');
+        socket.emit('reset_video_feed');
+        
         drawDots();
-
-        // Reset current dot index and current level
         currentDotIndex = 0;
         currentLevel = 0;
+        updateLevelIndicator();
 
-        // Create level indicators
-        createLevelIndicators();
-        updateLevelIndicators();
-        // Start timer for current level
+        socket.emit('start_detection');
         startTimer();
     }
 
-    // Function to start the timer for the current level
     function startTimer() {
         const levelDuration = levels[currentLevel].duration;
-        const segmentDuration = levelDuration ; // Time per line segment
         let startTime = Date.now();
 
         timerInterval = setInterval(() => {
             const elapsedTime = Date.now() - startTime;
-            const progress = elapsedTime / segmentDuration;
+            const progress = elapsedTime / levelDuration;
             timeLeft = Math.ceil((levelDuration - elapsedTime) / 1000);
 
             if (progress >= 1) {
@@ -139,7 +121,6 @@
                 currentDotIndex++;
 
                 if (currentDotIndex >= dots.length) {
-                    alert('Level Completed!');
                     clearInterval(timerInterval);
                     nextLevel();
                 } else {
@@ -152,80 +133,97 @@
                 }
                 drawLine(dots[currentDotIndex], dots[(currentDotIndex + 1) % dots.length], progress);
             }
-
-            // Display the countdown timer
-            displayTimer();
-        }, 30); // Update line and timer every 30 milliseconds
+        }, 30);
     }
 
-    // Function to move to the next level
     function nextLevel() {
-        currentLevel++;
+        // Stop current level's detection
+        socket.emit('stop_detection');
+
+        // Show level completion alert
         if (currentLevel < levels.length) {
-            // Update level indicators
-            updateLevelIndicators();
-            currentDotIndex = 0; // Reset dot index for the new level
-            alert(`Congratulations! You've completed Level ${currentLevel}. Starting Level ${currentLevel + 1}`);
-            startTimer();
-        } else {
-            // All levels completed
-            alert('Congratulations! You\'ve completed all levels.');
-            drawDots();
+            const response = confirm(levels[currentLevel].alertMessage);
+            
+            // If user clicks OK, handle next level transition
+            if (response) {
+                // Reset video feed completely
+                socket.emit('reset_video_feed');
+                
+                currentLevel++;
+                if (currentLevel < levels.length) {
+                    // Reset game state
+                    currentDotIndex = 0;
+                    updateLevelIndicator();
+                    drawDots();
+                    
+                    // Small delay to ensure video feed resets
+                    setTimeout(() => {
+                        // Restart detection and timer
+                        socket.emit('start_detection');
+                        startTimer();
+                    }, 500);
+                } else {
+                    // Final level completion
+                    socket.emit('stop_detection');
+                    drawDots();
+                }
+            }
         }
     }
 
-    // Function to stop the game
     function stopGame() {
         clearInterval(timerInterval);
+        socket.emit('stop_detection');
     }
 
-    // Modified resetGame function to reset level indicators
-    function resetGame() {
-        stopGame();
-        drawDots();
-        currentDotIndex = 0;
-        currentLevel = 0;
-        // Clear level indicators and create new ones
-        const levelIndicator = document.getElementById('levelIndicator');
-        levelIndicator.innerHTML = '';
-        createLevelIndicators();
-    }
+    socket.on('motion_detected', function (data) {
+        // Only stop the game if motion is detected during an active level
+        if (currentLevel < levels.length) {
+            stopGame();
 
-    // Function to restart the current level
-    function restartLevel() {
-        stopGame();
-        drawDots();
-        currentDotIndex = 0;
-        startTimer();
-    }
-
-    // Event listeners for buttons
-    document.getElementById('startButton').addEventListener('click', startGame);
-    document.getElementById('stopButton').addEventListener('click', stopGame);
-    document.getElementById('resetButton').addEventListener('click', resetGame);
-    document.getElementById('restartLevelButton').addEventListener('click', restartLevel);
-
-    // Initial draw
-    drawDots();
-    const socket = io.connect('http://' + document.domain + ':' + location.port);
-
-    // Listen for the 'motion_detected' event
-    socket.on('motion_detected', function(data) {
-        // Display the error message
-        stopGame();
-
-        // Display the error message
-        const errorMessage = document.getElementById('errorMessage');
-        const errorMessageText = document.getElementById('errorMessageText');
-        errorMessageText.textContent = data.message;
-        errorMessage.style.display = 'block';
+            const errorMessage = document.getElementById('errorMessage');
+            const errorMessageText = document.getElementById('errorMessageText');
+            errorMessageText.textContent = data.message;
+            errorMessage.style.display = 'block';
+        }
     });
 
-    // Event listener for error button to reset the game
-    document.getElementById('errorButton').addEventListener('click', function() {
+    document.getElementById('errorButton').addEventListener('click', function () {
         const errorMessage = document.getElementById('errorMessage');
         errorMessage.style.display = 'none';
-        resetGame();
+        stopGame();
+        drawDots();
     });
 
+    document.getElementById('startButton').addEventListener('click', function () {
+        startGame();
+    });
+
+    document.getElementById('stopButton').addEventListener('click', function () {
+        stopGame();
+    });
+
+    document.getElementById('resetButton').addEventListener('click', function () {
+        stopGame();
+        socket.emit('stop_detection');
+        socket.emit('reset_video_feed');
+        currentLevel = 0;
+        currentDotIndex = 0;
+        updateLevelIndicator();
+        drawDots();
+    });
+
+    document.getElementById('restartLevelButton').addEventListener('click', function () {
+        stopGame();
+        socket.emit('stop_detection');
+        socket.emit('reset_video_feed');
+        socket.emit('start_detection');
+        currentDotIndex = 0;
+        updateLevelIndicator();
+        startTimer();
+    });
+
+    drawDots();
+    updateLevelIndicator();
 })();
+
